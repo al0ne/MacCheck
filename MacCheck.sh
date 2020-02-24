@@ -2,26 +2,30 @@
 
 echo ""
 echo " ========================================================= "
-echo " \                 Mac应急响应/信息搜集脚本 V1.0          / "
+echo " \                 Mac应急响应/信息搜集脚本 V1.0         / "
 echo " ========================================================= "
 echo " # Mac OS 系统检测脚本                    "
 echo " # author：al0ne                    "
 echo " # https://github.com/al0ne                    "
+echo " # 重点搜集MAC下系统信息，检测挖矿病毒以及其他常见病毒，开箱即用"
 echo -e "\n"
 
-# 重点搜集MAC下系统信息，检测挖矿病毒以及其他常见病毒，开箱即用
 
-filename='result_'$(date +%s)'.log'
+filename='result_'$(hostname -s)'_'$(whoami)'.log'
+
+if [ -e "${filename}" ]; then
+    echo '' >$filename
+fi
 
 xsdk() {
     echo -e "\n\033[31m[+]xsdk挖矿检测\033[0m" | tee -a $filename
-    result=$(ps aux | egrep "mgo|xsdk" | grep -v 'grep')
+    result=$(ps aux | egrep -i "mgo|xsdk" | grep -v 'grep')
     if [ -n "$result" ]; then
         echo "存在xsdk挖矿进程!" | tee -a $filename
         echo $result | tee -a $filename
         echo -e "\n" | tee -a $filename
     fi
-    result=$(ls -a /etc/bbrj /etc/evtconf /etc/mach_inlt /etc/periodoc.d ~/Documents/Tunings 2>/dev/null)
+    result=$(ls -a /etc/bbrj /etc/evtconf /etc/mach_inlt /etc/periodoc.d ~/Documents/Tunings /private/etc/mach_inlt /private/etc/mach_init.d 2>/dev/null)
     if [ -n "$result" ]; then
         echo "存在xsdk挖矿文件!" | tee -a $filename
         echo $result | tee -a $filename
@@ -31,7 +35,7 @@ xsdk() {
 
 ssl3() {
     echo -e "\n\033[31m[+]ssl3挖矿检测\033[0m" | tee -a $filename
-    result=$(ps -ef | egrep "ssl\d.plist")
+    result=$(ps -ef | egrep -i "ssl\d.plist")
     if [ -n "$result" ]; then
         echo "存在ssl3挖矿进程!" | tee -a $filename
         echo $result | tee -a $filename
@@ -44,7 +48,7 @@ ssl3() {
         echo -e "\n" | tee -a $filename
 
     fi
-    result=$(find ~/Library/Caches -name '*.plist' | egrep 'com.apple.[a-zA-Z0-9]+.plist' 2>/dev/null)
+    result=$(find ~/Library/Caches -name '*.plist' | egrep 'com.apple.[a-zA-Z0-9]+.plist' | grep -v 'nsservicescache' 2>/dev/null)
     if [ -n "$result" ]; then
         echo "可疑ssl3挖矿文件!" | tee -a $filename
         echo $result | tee -a $filename
@@ -55,7 +59,7 @@ ssl3() {
 
 autorun() {
     echo -e "\033[31m[+]可疑启动项检测\033[0m" | tee -a $filename
-    ls -a /Library/LaunchDaemons /Library/LaunchAgents ~/Library/LaunchAgents /System/Library/LaunchAgents /System/Library/LaunchDaemons | egrep '\bLibrary|com\.\w{2,6}.plist|yahoo|ssl|unioncrypto|^\.\w+' | egrep -v "\->" | tee -a $filename
+    ls -a /Library/LaunchDaemons /Library/LaunchAgents ~/Library/LaunchAgents /System/Library/LaunchAgents /System/Library/LaunchDaemons | egrep -i '\bLibrary|com\.\w{2,6}.plist|yahoo|apple.google|ssl|unioncrypto|^\.\w+' | egrep -v "\->" | tee -a $filename
     echo -e "\n" | tee -a $filename
 
 }
@@ -129,7 +133,7 @@ main_check() {
         echo -e "SSH key文件不存在\n" | tee -a $filename
     fi
     echo -e "\033[00;31m[+]用户启动项\033[00m" | tee -a $filename
-    ls -alht /Library/LaunchDaemons /Library/LaunchAgents ~/Library/LaunchAgents
+    ls -alht /Library/LaunchDaemons /Library/LaunchAgents ~/Library/LaunchAgents | tee -a $filename
 
 }
 
