@@ -10,7 +10,6 @@ echo " # https://github.com/al0ne                    "
 echo " # 重点搜集MAC下系统信息，检测挖矿病毒以及其他常见病毒，开箱即用"
 echo -e "\n"
 
-
 filename='result_'$(hostname -s)'_'$(whoami)'.log'
 
 if [ -e "${filename}" ]; then
@@ -25,7 +24,7 @@ xsdk() {
         echo $result | tee -a $filename
         echo -e "\n" | tee -a $filename
     fi
-    result=$(ls -a /etc/bbrj /etc/evtconf /etc/mach_inlt /etc/periodoc.d ~/Documents/Tunings /private/etc/mach_inlt /private/etc/mach_init.d 2>/dev/null)
+    result=$(ls -a /etc/bbrj /etc/evtconf /etc/mach_inlt /etc/periodoc.d ~/Documents/Tunings /private/etc/mach_inlt /private/etc/mach_init.d /private/etc/mach_inlt_per_user.d/ /private/etc/mach_inlt_per_login_session.d 2>/dev/null)
     if [ -n "$result" ]; then
         echo "存在xsdk挖矿文件!" | tee -a $filename
         echo $result | tee -a $filename
