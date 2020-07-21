@@ -2,7 +2,7 @@
 
 echo ""
 echo " ========================================================= "
-echo " \                 Mac应急响应/信息搜集脚本 V1.0         / "
+echo " \                 Mac应急响应/信息搜集脚本 V1.1         / "
 echo " ========================================================= "
 echo " # Mac OS 系统检测脚本                    "
 echo " # author：al0ne                    "
@@ -21,12 +21,18 @@ xsdk() {
     result=$(ps aux | egrep -i "mgo|xsdk" | grep -v 'grep')
     if [ -n "$result" ]; then
         echo "存在xsdk挖矿进程!" | tee -a $filename
+        pid=$(ps -ef | egrep 'xsdk|mgo' | egrep -v 'egrep' | awk '{print $2}')
+        echo "kill -9 干掉xsdk挖矿进程!" | tee -a $filename
+        kill -9 $pid
         echo $result | tee -a $filename
         echo -e "\n" | tee -a $filename
     fi
-    result=$(ls -a /etc/bbrj /etc/evtconf /etc/mach_inlt /etc/periodoc.d ~/Documents/Tunings /private/etc/mach_inlt /private/etc/mach_init.d /private/etc/mach_inlt_per_user.d/ /private/etc/mach_inlt_per_login_session.d 2>/dev/null)
+    result=$(ls -alh /etc/bbrj /etc/evtconf /etc/mach_inlt /etc/periodoc.d ~/Documents/Tunings /private/etc/mach_inlt /private/etc/mach_init.d /private/etc/mach_inlt_per_user.d/ /private/etc/mach_inlt_per_login_session.d 2>/dev/null)
     if [ -n "$result" ]; then
         echo "存在xsdk挖矿文件!" | tee -a $filename
+        files=$(ls /etc/bbrj /etc/evtconf /etc/mach_inlt /etc/periodoc.d ~/Documents/Tunings /private/etc/mach_inlt /private/etc/mach_init.d /private/etc/mach_inlt_per_user.d/ /private/etc/mach_inlt_per_login_session.d 2>/dev/null)
+        echo "删除xsdk挖矿文件!" | tee -a $filename
+        echo $files | sed 's@:@@g' | xargs -I F rm -r "F"
         echo $result | tee -a $filename
 
     fi
@@ -51,6 +57,8 @@ ssl3() {
     if [ -n "$result" ]; then
         echo "可疑ssl3挖矿文件!" | tee -a $filename
         echo $result | tee -a $filename
+        echo "删除ssl3挖矿文件!" | tee -a $filename
+        echo $result | xargs -I F rm -r "F"
         echo -e "\n" | tee -a $filename
 
     fi
